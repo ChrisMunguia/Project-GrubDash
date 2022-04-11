@@ -10,23 +10,23 @@ function bodyHasProperty(property) {
 		if (data[property] && data[property] !== "") {
 			return next();
 		}
-		next({ status: 404, message: `Dish must include a ${property}` });
+		next({ status: 400, message: `Dish must include a ${property}` });
 	};
 }
 
 function hasValidPrice(req, res, next) {
 	const { data: { price } = {} } = req.body;
-	if (price > 0 && Number.isInteger(price)) {
+	if (Number(price) > 0 && Number.isInteger(price)) {
 		return next();
 	}
-	next({ status: 404, message: `Dish must have a price that is an integer greater than 0` });
+	next({ status: 400, message: `Dish must have a price that is an integer greater than 0` });
 }
 
 function dishExists(req, res, next) {
 	const { dishId } = req.params;
 	const foundDish = dishes.find((dish) => dish.id == dishId);
 
-	if (foundId) {
+	if (foundDish) {
 		res.locals.dish = foundDish;
 		return next();
 	}
@@ -37,35 +37,31 @@ function dishExists(req, res, next) {
 function hasValidId(req, res, next) {
 	const { dishId } = req.params;
 	const { data: { id } = {} } = req.body;
-	if (id !== dishId) {
+	if (id) {
+		if (id === dishId) {
+			return next();
+		}
+
 		return next({
-			status: 404,
-			message: `Dish id does not match route id. Dish: ${id}, Route: ${dish.Id}`,
+			status: 400,
+			message: `Dish id does not match route id. Dish: ${id}, Route: ${dishId}`,
 		});
 	}
-
 	next();
 }
 
-// TODO: Implement the /dishes handlers needed to make the tests pass
 const create = (req, res) => {
 	const { data: { name, description, price, image_url } = {} } = req.body;
-	const newDish = {
-		id: nextId(),
-		name: name,
-		description: description,
-		price: price,
-		image_url: image_url,
-	};
+	const newDish = { id: nextId(), name, description, price, image_url };
 	dishes.push(newDish);
-	res.status(201).sjon({ data: newDish });
+	res.status(201).json({ data: newDish });
 };
 
 const read = (req, res) => {
 	res.json({ data: res.locals.dish });
 };
 
-const update = (req, res, next) => {
+const update = (req, res) => {
 	const dish = res.locals.dish;
 	const { data: { name, description, price, image_url } = {} } = req.body;
 
@@ -85,8 +81,9 @@ module.exports = {
 	create: [
 		bodyHasProperty("name"),
 		bodyHasProperty("description"),
-		hasValidPrice(),
+		bodyHasProperty("price"),
 		bodyHasProperty("image_url"),
+		hasValidPrice,
 		create,
 	],
 	read: [dishExists, read],
@@ -95,8 +92,9 @@ module.exports = {
 		hasValidId,
 		bodyHasProperty("name"),
 		bodyHasProperty("description"),
-		hasValidPrice(),
+		bodyHasProperty("price"),
 		bodyHasProperty("image_url"),
+		hasValidPrice,
 		update,
 	],
 	list,
