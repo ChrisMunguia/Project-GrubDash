@@ -5,7 +5,7 @@ const dishes = require(path.resolve("src/data/dishes-data"));
 const nextId = require("../utils/nextId");
 
 function bodyHasProperty(property) {
-	return function (req, res, next) {
+	return function validateProperty(req, res, next) {
 		const { data = {} } = req.body;
 		if (data[property] && data[property] !== "") {
 			return next();
