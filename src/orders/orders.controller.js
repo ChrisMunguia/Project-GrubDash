@@ -4,6 +4,7 @@ const orders = require(path.resolve("src/data/orders-data"));
 // Use this function to assigh ID's when necessary
 const nextId = require("../utils/nextId");
 
+//function to check if a body property is present
 function bodyHasProperty(property) {
 	return function validateProperty(req, res, next) {
 		const { data = {} } = req.body;
@@ -14,6 +15,7 @@ function bodyHasProperty(property) {
 	};
 }
 
+//function to check if dishes array is valid via req.body
 function isDishesValid(req, res, next) {
 	const { data: { dishes } = {} } = req.body;
 
@@ -24,6 +26,7 @@ function isDishesValid(req, res, next) {
 	next({ status: 400, message: `Order must include at least one dish` });
 }
 
+//function to check if the quantity of each dish is valid
 function hasValidQuantity(req, res, next) {
 	const { data: { dishes } = {} } = req.body;
 
@@ -39,6 +42,7 @@ function hasValidQuantity(req, res, next) {
 	next();
 }
 
+//function to check if the order id exists via req.body
 function orderExists(req, res, next) {
 	const { orderId } = req.params;
 	const foundOrder = orders.find((order) => order.id == orderId);
@@ -51,6 +55,7 @@ function orderExists(req, res, next) {
 	next({ status: 404, message: `Order does not exist: ${orderId}` });
 }
 
+//function to check if id from route matches id via req.body
 function hasValidId(req, res, next) {
 	const { orderId } = req.params;
 	const { data: { id } = {} } = req.body;
@@ -67,6 +72,7 @@ function hasValidId(req, res, next) {
 	next();
 }
 
+//function to check if the status for the order is valid to be changed
 function hasValidStatus(req, res, next) {
 	const { data: { status } = {} } = req.body;
 	const validStatus = ["pending", "preparing", "out-for-delivery"];
@@ -81,6 +87,7 @@ function hasValidStatus(req, res, next) {
 		  });
 }
 
+//function to check if order has valid status for deletion
 function isStatusPending(req, res, next) {
 	const status = res.locals.order.status;
 	if (status && status === "pending") {
@@ -89,6 +96,7 @@ function isStatusPending(req, res, next) {
 	next({ status: 400, message: "An order cannot be deleted unless it is pending" });
 }
 
+//Create a new order
 const create = (req, res) => {
 	const { data: { deliverTo, mobileNumber, status, dishes } = {} } = req.body;
 	const newOrder = { id: nextId(), deliverTo, mobileNumber, status, dishes };
@@ -97,10 +105,12 @@ const create = (req, res) => {
 	res.status(201).json({ data: newOrder });
 };
 
+//Read order based on id
 const read = (req, res) => {
 	res.json({ data: res.locals.order });
 };
 
+//Update order properties based on id
 const update = (req, res) => {
 	const order = res.locals.order;
 	const { data: { deliverTo, mobileNumber, status, dishes } = {} } = req.body;
@@ -113,6 +123,7 @@ const update = (req, res) => {
 	res.json({ data: order });
 };
 
+//Delete order by id with valid status
 const destroy = (req, res) => {
 	const order = res.locals.order;
 	const index = orders.findIndex((ord) => ord.id === Number(order.Id));
@@ -120,6 +131,7 @@ const destroy = (req, res) => {
 	res.sendStatus(204);
 };
 
+//List all orders
 const list = (req, res) => {
 	res.json({ data: orders });
 };

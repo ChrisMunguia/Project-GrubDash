@@ -4,6 +4,7 @@ const dishes = require(path.resolve("src/data/dishes-data"));
 // Use this function to assign ID's when necessary
 const nextId = require("../utils/nextId");
 
+//function to check if a body property is present
 function bodyHasProperty(property) {
 	return function validateProperty(req, res, next) {
 		const { data = {} } = req.body;
@@ -14,6 +15,7 @@ function bodyHasProperty(property) {
 	};
 }
 
+//function to check if a valid price is in the req.body
 function hasValidPrice(req, res, next) {
 	const { data: { price } = {} } = req.body;
 	if (Number(price) > 0 && Number.isInteger(price)) {
@@ -22,6 +24,7 @@ function hasValidPrice(req, res, next) {
 	next({ status: 400, message: `Dish must have a price that is an integer greater than 0` });
 }
 
+//function to check if a dish with the id from route exists
 function dishExists(req, res, next) {
 	const { dishId } = req.params;
 	const foundDish = dishes.find((dish) => dish.id == dishId);
@@ -34,6 +37,7 @@ function dishExists(req, res, next) {
 	next({ status: 404, message: `Dish does not exist: ${dishId}` });
 }
 
+//function to validate the id from route is matching the id from the req.body
 function hasValidId(req, res, next) {
 	const { dishId } = req.params;
 	const { data: { id } = {} } = req.body;
@@ -50,6 +54,7 @@ function hasValidId(req, res, next) {
 	next();
 }
 
+//Create a new dish
 const create = (req, res) => {
 	const { data: { name, description, price, image_url } = {} } = req.body;
 	const newDish = { id: nextId(), name, description, price, image_url };
@@ -57,10 +62,12 @@ const create = (req, res) => {
 	res.status(201).json({ data: newDish });
 };
 
+//Read dish based on id
 const read = (req, res) => {
 	res.json({ data: res.locals.dish });
 };
 
+//Update dish properties
 const update = (req, res) => {
 	const dish = res.locals.dish;
 	const { data: { name, description, price, image_url } = {} } = req.body;
@@ -73,6 +80,7 @@ const update = (req, res) => {
 	res.json({ data: dish });
 };
 
+//List all dishes
 const list = (req, res) => {
 	res.json({ data: dishes });
 };
