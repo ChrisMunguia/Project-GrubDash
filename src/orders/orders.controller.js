@@ -97,21 +97,21 @@ function isStatusPending(req, res, next) {
 }
 
 //Create a new order
-const create = (req, res) => {
+function create(req, res) {
 	const { data: { deliverTo, mobileNumber, status, dishes } = {} } = req.body;
 	const newOrder = { id: nextId(), deliverTo, mobileNumber, status, dishes };
 
 	orders.push(newOrder);
 	res.status(201).json({ data: newOrder });
-};
+}
 
 //Read order based on id
-const read = (req, res) => {
+function read(req, res) {
 	res.json({ data: res.locals.order });
-};
+}
 
 //Update order properties based on id
-const update = (req, res) => {
+function update(req, res) {
 	const order = res.locals.order;
 	const { data: { deliverTo, mobileNumber, status, dishes } = {} } = req.body;
 
@@ -121,20 +121,20 @@ const update = (req, res) => {
 	order.dishes = dishes;
 
 	res.json({ data: order });
-};
+}
 
 //Delete order by id with valid status
-const destroy = (req, res) => {
+function destroy(req, res) {
 	const order = res.locals.order;
 	const index = orders.findIndex((ord) => ord.id === Number(order.Id));
 	orders.splice(index, 1);
 	res.sendStatus(204);
-};
+}
 
 //List all orders
-const list = (req, res) => {
+function list(req, res) {
 	res.json({ data: orders });
-};
+}
 
 module.exports = {
 	create: [

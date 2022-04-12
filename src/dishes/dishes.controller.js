@@ -55,20 +55,20 @@ function hasValidId(req, res, next) {
 }
 
 //Create a new dish
-const create = (req, res) => {
+function create(req, res) {
 	const { data: { name, description, price, image_url } = {} } = req.body;
 	const newDish = { id: nextId(), name, description, price, image_url };
 	dishes.push(newDish);
 	res.status(201).json({ data: newDish });
-};
+}
 
 //Read dish based on id
-const read = (req, res) => {
+function read(req, res) {
 	res.json({ data: res.locals.dish });
-};
+}
 
 //Update dish properties
-const update = (req, res) => {
+function update(req, res) {
 	const dish = res.locals.dish;
 	const { data: { name, description, price, image_url } = {} } = req.body;
 
@@ -78,12 +78,12 @@ const update = (req, res) => {
 	dish.image_url = image_url;
 
 	res.json({ data: dish });
-};
+}
 
 //List all dishes
-const list = (req, res) => {
+function list(req, res) {
 	res.json({ data: dishes });
-};
+}
 
 module.exports = {
 	create: [
